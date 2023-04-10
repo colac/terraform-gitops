@@ -17,9 +17,13 @@ jobs:
   terraform:
     name: Terraform
     #needs: az-login
-    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 1
+      matrix:
+        my_var: [tst, pp, prd]
     #environment: $GITHUB_BASE_REF
     # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+    runs-on: ubuntu-latest
     defaults:
       run:
         shell: bash
@@ -51,22 +55,22 @@ jobs:
         ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
       run: terraform init
       
-    - name: Terraform workspace new tst
+    - name: Terraform workspace new {{ matrix.my_var }}
       env:
         ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
         ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
         ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
         ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
-      run: terraform workspace new tst
+      run: terraform workspace new {{ matrix.my_var }}
       continue-on-error: true
       
-    - name: Terraform workspace select tst
+    - name: Terraform workspace select {{ matrix.my_var }}
       env:
         ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
         ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
         ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
         ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
-      run: terraform workspace select tst
+      run: terraform workspace select {{ matrix.my_var }}
       
     # Checks that all Terraform configuration files adhere to a canonical format
     - name: Terraform Format
