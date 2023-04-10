@@ -18,7 +18,7 @@ jobs:
     name: Terraform
     #needs: az-login
     runs-on: ubuntu-latest
-    environment: $GITHUB_BASE_REF
+    #environment: $GITHUB_BASE_REF
     # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
     defaults:
       run:
