@@ -1,9 +1,0 @@
-{
-  "env": {
-    "default": {
-      "tst": "tst",
-      "preprd": "preprd",
-      "prd": "prd"
-    }
-  }
-}
