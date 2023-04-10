@@ -1,0 +1,81 @@
+
+name: 'Terraform'
+
+on: 
+  pull_request:
+    branches:
+      - "main"
+
+jobs:
+
+  github-actions-environment-variables-ubuntu:
+    runs-on: ubuntu-latest
+    steps:
+      - name: List of the GitHub Actions environment variables
+        run: env
+
+  terraform:
+    name: Terraform
+    #needs: az-login
+    runs-on: ubuntu-latest
+    environment: $GITHUB_BASE_REF
+    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+    # Checkout the repository to the GitHub Actions runner
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Export azure creds for terraform to access azure SA
+      #if: github.base_ref == 'tst'
+      run: |
+        export ARM_CLIENT_ID=${{ secrets.ARM_CLIENT_ID }} ARM_CLIENT_SECRET=${{ secrets.ARM_CLIENT_SECRET }} ARM_SUBSCRIPTION_ID=${{ secrets.ARM_SUBSCRIPTION_ID }} ARM_TENANT_ID=${{ secrets.ARM_TENANT_ID }}
+    - name: List of the GitHub Actions environment variables - after Export azure creds
+      run: env
+
+    # Install the latest version of Terraform CLI and configure the Terraform CLI configuration file with a Terraform Cloud user API token
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v1
+      #with:
+        #cli_config_credentials_token: ${{ secrets.TF_API_TOKEN }}
+
+    # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
+    - name: Terraform Init
+      env:
+        ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+        ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+        ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+        ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+      run: terraform init
+      
+    - name: Terraform workspace new tst
+      env:
+        ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+        ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+        ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+        ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+      run: terraform workspace new tst
+      continue-on-error: true
+      
+    - name: Terraform workspace select tst
+      env:
+        ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+        ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+        ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+        ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+      run: terraform workspace select tst
+      
+    # # Checks that all Terraform configuration files adhere to a canonical format
+    # - name: Terraform Format
+    #   run: terraform fmt -check
+
+    # Generates an execution plan for Terraform
+    - name: Terraform Plan
+      env:
+        ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+        ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+        ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+        ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+      run: terraform plan -input=false
