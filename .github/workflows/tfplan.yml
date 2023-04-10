@@ -61,7 +61,7 @@ jobs:
         ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
         ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
         ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
-      run: terraform workspace new {{ matrix.my_var }}
+      run: terraform workspace new ${{ matrix.my_var }}
       continue-on-error: true
       
     - name: Terraform workspace select {{ matrix.my_var }}
@@ -70,7 +70,7 @@ jobs:
         ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
         ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
         ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
-      run: terraform workspace select {{ matrix.my_var }}
+      run: terraform workspace select ${{ matrix.my_var }}
       
     # Checks that all Terraform configuration files adhere to a canonical format
     - name: Terraform Format
